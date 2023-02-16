@@ -1,18 +1,19 @@
-# 参考： https://raw.githubusercontent.com/bighammer-link/jichang_checkin/main/main.py
-
-
+# 只要机场网站''' Powered by SSPANEL ''',就可以进行签到
+# 特别感谢原脚本作者 @bighammer-link
+# 以及青龙面板通知模块作者 @Kirin
+# Modify: benlw4,2023-02-16
+# 使用方法，订阅此脚本到青龙面板，并修改对应的url，登陆用户名及密码即可
 import requests, json, re, os
+from sendNotify import *
+
 
 session = requests.session()
-# 机场的地址
-url = os.environ.get('URL')
-# 配置用户名（一般是邮箱）
-email = os.environ.get('EMAIL')
-# 配置用户名对应的密码 和上面的email对应上
-passwd = os.environ.get('PASSWD')
-# server酱
-SCKEY = os.environ.get('SCKEY')
-
+# 以下为修改区-开始
+url = '' # 机场的地址
+email = '' # 配置用户名（一般是邮箱）
+passwd = '' # 配置用户名对应的密码 和上面的email对应上
+sendmesg = True # 默认开启通知
+# 修改区-结束
 login_url = '{}/auth/login'.format(url)
 check_url = '{}/user/checkin'.format(url)
 
@@ -34,13 +35,10 @@ try:
     print(result['msg'])
     content = result['msg']
     # 进行推送
-    if SCKEY != '':
-        push_url = 'https://sctapi.ftqq.com/{}.send?title=机场签到&desp={}'.format(SCKEY, content)
-        requests.post(url=push_url)
-        print('推送成功')
+    if sendmesg:
+        send('机场签到通知[Party]',content)  
 except:
-    content = '签到失败'
+    content = '签到失败,请检查'
     print(content)
-    if SCKEY != '':
-        push_url = 'https://sctapi.ftqq.com/{}.send?title=机场签到&desp={}'.format(SCKEY, content)
-        requests.post(url=push_url)
+    if sendmesg:
+        send('机场签到通知',content)
